@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Química e Nutrição</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #a0c4ff, #ff677d);
+            color: #333;
+            overflow: hidden; /* Impede rolagem e mantém o layout centralizado */
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .container.hidden {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .question-image {
+            max-width: 80%;
+            height: auto;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .option-button {
+            margin-top: 10px;
+            padding: 12px;
+            font-size: 16px;
+            width: calc(100% - 24px);
+            border: none;
+            border-radius: 6px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .option-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        #score {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #credits {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        #start-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #start-button {
+            padding: 12px 24px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        #start-button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="start-screen" class="container">
+        <h1>Quiz de Química e Nutrição</h1>
+        <p>Teste seus conhecimentos sobre química e nutrição com este quiz!</p>
+        <button id="start-button">Começar Quiz</button>
+    </div>
+
+    <div id="quiz-container" class="container hidden">
+        <img id="question-image" src="" alt="Imagem da pergunta" class="question-image">
+        <div id="question-text">Pergunta aparecerá aqui</div>
+        <div id="options">
+            <button class="option-button" onclick="checkAnswer(0)">Alternativa 1</button>
+            <button class="option-button" onclick="checkAnswer(1)">Alternativa 2</button>
+            <button class="option-button" onclick="checkAnswer(2)">Alternativa 3</button>
+            <button class="option-button" onclick="checkAnswer(3)">Alternativa 4</button>
+        </div>
+        <div id="message"></div>
+        <div id="score">Pontuação: 0</div>
+        <div id="credits" class="hidden">Desenvolvido pelo 1° B - EM</div>
+    </div>
+
+    <script>
+        const perguntas = [
+            { pergunta: "Qual é o valor energético de 1 grama de carboidrato?", imagem: "https://th.bing.com/th/id/OIG3.mU13at9YgauZfHpdVEr9?w=1024&h=1024&rs=1&pid=ImgDetMain", alternativas: ["2 kcal", "4 kcal", "6 kcal", "9 kcal"], resposta: "4 kcal" },
+            { pergunta: "Qual dispositivo é utilizado para medir o valor calórico dos alimentos?", imagem: "https://equipar.com.mx/wp-content/uploads/2020/03/8-parr_1341.jpg", alternativas: ["Termômetro", "Barômetro", "Calorímetro", "Higrômetro"], resposta: "Calorímetro" },
+            { pergunta: "Qual é a principal função da vitamina A no organismo?", imagem: "https://th.bing.com/th/id/OIG2.kPojd89EuUgfLAr08Hfn?pid=ImgGn", alternativas: ["Coagulação do sangue", "Síntese de colágeno", "Transporte de oxigênio", "Processos relacionados à visão"], resposta: "Processos relacionados à visão" },
+            { pergunta: "Qual vitamina é conhecida por prevenir o escorbuto?", imagem: "https://th.bing.com/th/id/OIG4.SdD7pOj7oC.JDT.90j_a?w=1024&h=1024&rs=1&pid=ImgDetMain", alternativas: ["Vitamina A", "Vitamina B12", "Vitamina C", "Vitamina K"], resposta: "Vitamina C" },
+            { pergunta: "Qual é a principal fonte alimentar de vitamina K?", imagem: "https://th.bing.com/th/id/OIG2.pcKMLw_wsYEAvXG9L_zh?pid=ImgGn", alternativas: ["Frutas cítricas", "Vegetais de coloração verde-escura", "Carnes vermelhas", "Laticínios"], resposta: "Vegetais de coloração verde-escura" },
+            { pergunta: "Qual condição é causada pela deficiência de ferro no organismo?", imagem: "https://th.bing.com/th/id/OIG3.Ex5YPrNccMdYafJ.lCLy?pid=ImgGn", alternativas: ["Beribéri", "Escorbuto", "Anemia ferropriva", "Xeroftalmia"], resposta: "Anemia ferropriva" },
+            { pergunta: "Qual é a quantidade de calor necessária para elevar a temperatura de 1 grama de água em 1°C?", imagem: "https://th.bing.com/th/id/OIG1.aZju_xQLc12tzzXHaPkf?pid=ImgGn", alternativas: ["1 cal", "4 cal", "1 kcal", "4 kcal"], resposta: "1 cal" },
+            { pergunta: "Qual vitamina é essencial para a coagulação do sangue?", imagem: "https://th.bing.com/th/id/OIG2.kA99RLwccRoVfx70n7xN?pid=ImgGn", alternativas: ["Vitamina A", "Vitamina C", "Vitamina D", "Vitamina K"], resposta: "Vitamina K" },
+            { pergunta: "Qual das seguintes vitaminas é lipossolúvel?", imagem: "https://th.bing.com/th/id/OIG4.rJekV4HVb582I18ADtzJ?pid=ImgGn", alternativas: ["Vitamina B1", "Vitamina C", "Vitamina E", "Vitamina B12"], resposta: "Vitamina E" },
+            { pergunta: "Qual condição é caracterizada por desnutrição severa devido à ingestão quase inexistente de proteínas?", imagem: "https://www.healthbenefitstimes.com/glossary/wp-content/uploads/2020/07/Kwashiorkor-from-the-Ga-language-of-West-Africa-674x1024.jpg", alternativas: ["Marasmo", "Kwashiorkor", "Anemia perniciosa", "Beribéri"], resposta: "Kwashiorkor" }
+        ];
+
+        let availableQuestions = [...perguntas];
+        let score = 0;
+        let currentQuestion = null;
+
+        document.getElementById('start-button').addEventListener('click', () => {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            loadQuestion();
+        });
+
+        function loadQuestion() {
+            if (availableQuestions.length > 0) {
+                const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+                const currentWord = availableQuestions[randomIndex];
+                document.getElementById("question-text").innerText = currentWord.pergunta;
+                document.getElementById("question-image").src = currentWord.imagem;
+                document.getElementById("question-image").style.opacity = 1;
+                document.getElementById("message").innerText = '';
+                document.getElementById("message").style.color = "black";
+                const buttons = document.querySelectorAll(".option-button");
+                currentWord.alternativas.forEach((alt, index) => {
+                    buttons[index].innerText = alt;
+                });
+                availableQuestions.splice(randomIndex, 1);
+                currentQuestion = currentWord;
+            } else {
+                document.getElementById("question-text").innerText = 'Parabéns! Você completou o quiz!';
+                document.getElementById("question-image").style.display = 'none';
+                document.getElementById("options").style.display = 'none';
+                document.getElementById("message").innerText = `Sua pontuação final é ${score}.`;
+                document.getElementById("credits").classList.remove("hidden");
+            }
+        }
+
+        function checkAnswer(selectedIndex) {
+            const selectedAnswer = currentQuestion.alternativas[selectedIndex];
+            const message = document.getElementById("message");
+
+            if (selectedAnswer === currentQuestion.resposta) {
+                message.innerText = "Correto!";
+                message.style.color = "green";
+                score++;
+                document.getElementById("score").innerText = `Pontuação: ${score}`;
+            } else {
+                message.innerText = `Você errou! A resposta correta era "${currentQuestion.resposta}". Próxima pergunta...`;
+                message.style.color = "red";
+            }
+
+            setTimeout(loadQuestion, 2000); // Aguarda 2 segundos antes de carregar a próxima questão
+        }
+    </script>
+</body>
+</html>
